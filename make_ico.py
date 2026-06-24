@@ -102,6 +102,11 @@ try:
     img.save(dest_path, format="ICO", sizes=[(256, 256), (128, 128), (64, 64), (48, 48), (32, 32), (16, 16)])
     print(f"[성공] 고양이가 극대화된 멀티사이즈 ICO 변환 완료: {dest_path}")
 
+    # Save as high-quality transparent PNG for GitHub README
+    readme_png_path = r"E:\CLAUDE-CODE\깃허브\github-rainbow.png"
+    img.save(readme_png_path, format="PNG")
+    print(f"[성공] 리드미용 투명 PNG 저장 완료: {readme_png_path}")
+
 except Exception as e:
     print(f"[실패] 이미지 변환 도중 예외 발생: {str(e)}")
     sys.exit(1)

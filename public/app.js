@@ -310,6 +310,7 @@ async function selectRepository(repo) {
   if (isConnected) {
     const path = state.folders[repo.full_name];
     activeLocalPath.textContent = path;
+    activeLocalPath.title = '클릭하여 파일 탐색기에서 열기';
     btnDisconnect.classList.remove('hidden');
     gitSetupSection.classList.add('hidden');
     gitOpsSection.classList.remove('hidden');
@@ -318,6 +319,7 @@ async function selectRepository(repo) {
     await refreshGitStatus();
   } else {
     activeLocalPath.textContent = '설정되지 않음';
+    activeLocalPath.removeAttribute('title');
     btnDisconnect.classList.add('hidden');
     gitSetupSection.classList.remove('hidden');
     gitOpsSection.classList.add('hidden');
@@ -577,6 +579,27 @@ btnScanRepos.addEventListener('click', async () => {
     alert('자동 탐색 중 오류가 발생했습니다. 하단 콘솔 로그를 확인해 주세요.');
   } finally {
     hideLoading();
+  }
+});
+
+// Open local folder path in explorer click
+activeLocalPath.addEventListener('click', async () => {
+  if (!state.activeRepo) return;
+  const repoFullName = state.activeRepo.full_name;
+  const localPath = state.folders[repoFullName];
+  if (!localPath || localPath === '설정되지 않음') return;
+
+  logToConsole(`[${repoFullName}] 탐색기에서 로컬 폴더 열기 실행 중... 경로: ${localPath}`, 'system');
+  try {
+    const data = await apiFetch('/api/open-folder', {
+      method: 'POST',
+      body: JSON.stringify({ localPath })
+    });
+    if (data.success) {
+      logToConsole(`[${repoFullName}] 탐색기 열기 완료!`, 'success');
+    }
+  } catch (err) {
+    logToConsole('탐색기 폴더 열기 실패: ' + err.message, 'stderr');
   }
 });
 

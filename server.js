@@ -353,6 +353,24 @@ app.post('/api/scan-repos', (req, res) => {
   }
 });
 
+// Open local folder in Windows File Explorer
+app.post('/api/open-folder', (req, res) => {
+  const { localPath } = req.body;
+  if (!localPath || !fs.existsSync(localPath)) {
+    return res.status(400).json({ error: '유효하지 않은 로컬 경로입니다.' });
+  }
+
+  // Open directory using explorer.exe on Windows safely
+  const openCmd = `explorer.exe "${path.resolve(localPath)}"`;
+  
+  exec(openCmd, (error) => {
+    if (error) {
+      return res.status(500).json({ error: '폴더 열기 실패: ' + error.message });
+    }
+    res.json({ success: true });
+  });
+});
+
 // Map a local folder to a repository manually
 app.post('/api/connect-folder', (req, res) => {
   const { repoFullName, localPath } = req.body;
