@@ -660,6 +660,29 @@ app.post('/api/git-abort', async (req, res) => {
   }
 });
 
+// Heartbeat state for automatic shutdown
+let lastHeartbeat = Date.now();
+const STARTUP_TIME = Date.now();
+const GRACE_PERIOD = 15000; // 15 seconds grace period on startup
+const TIMEOUT = 10000;      // 10 seconds timeout
+
+app.post('/api/heartbeat', (req, res) => {
+  lastHeartbeat = Date.now();
+  res.json({ success: true });
+});
+
+// Periodically check if we should shut down the server
+setInterval(() => {
+  const now = Date.now();
+  if (now - STARTUP_TIME < GRACE_PERIOD) {
+    return;
+  }
+  if (now - lastHeartbeat > TIMEOUT) {
+    console.log('No heartbeat received. Shutting down server...');
+    process.exit(0);
+  }
+}, 3000);
+
 // Start server
 // Start server with dynamic port detection
 function startServer(port) {

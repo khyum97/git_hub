@@ -921,8 +921,29 @@ btnClearConsole.addEventListener('click', () => {
 
 
 /* ----------------------------------------------------
+   HEARTBEAT FOR AUTO-SHUTDOWN
+---------------------------------------------------- */
+function startHeartbeat() {
+  // Send heartbeat every 3 seconds
+  setInterval(async () => {
+    try {
+      await fetch('/api/heartbeat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+    } catch (err) {
+      // Ignore errors when server is already down
+    }
+  }, 3000);
+}
+
+
+/* ----------------------------------------------------
    APP INITIALIZATION
 ---------------------------------------------------- */
 document.addEventListener('DOMContentLoaded', () => {
   initApp();
+  startHeartbeat();
 });
